@@ -11,10 +11,12 @@
 
 #include "stm32f4xx.h"
 #include "lib_uart.h"
+#include "sx1278.h"
 
 int main(void)
 {
 	UART_lib_config(e_UART_2, DISABLE, 0, 0);
+	sx1278_init();
 
 	while(1)
 	{
