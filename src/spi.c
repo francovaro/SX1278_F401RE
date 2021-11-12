@@ -65,8 +65,8 @@ void spi_config(void)
   SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
   SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;		/* tx and rx */
   SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;							/* 1 byte */
-  SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
-  SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
+  SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;							/* cs low */
+  SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;							/* */
   SPI_InitStructure.SPI_NSS = SPI_NSS_Soft 								/*| SPI_NSSInternalSoft_Set*/;
   SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;
   SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
