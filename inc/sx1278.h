@@ -36,8 +36,8 @@ typedef enum
 
 typedef struct
 {
-	void(*START_SPI)(void);		/* cs lo*/
-	void(*STOP_SPI)(void);		/* cs high */
+//	void(*START_SPI)(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, BitAction BitVal);		/* cs lo*/
+//	void(*STOP_SPI)(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, BitAction BitVal);		/* cs high */
 
 	union
 	{

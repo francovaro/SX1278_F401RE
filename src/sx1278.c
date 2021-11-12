@@ -21,6 +21,7 @@
 void sx1278_init(t_sx1278* module)
 {
 	uint8_t tx_data;
+
 	spi_config();
 	sx1278_pin_init();
 	delay_init();
@@ -28,14 +29,22 @@ void sx1278_init(t_sx1278* module)
 	sx1278_set_mode(module, mode_sleep);
 	delay_ms(15u);
 
+	CS_LOW;
 	spi_single_write(SX1278_REGISTER_OPMODE, 0x88);	/* set LoRa mode */
-	spi_multiple_write(SX1278_REGISTER_FRF_MSB, &module->freq._freq_8[0], 3);	/* set working freq */
+	CS_HIGH;
 
+	CS_LOW;
+	spi_multiple_write(SX1278_REGISTER_FRF_MSB, &module->freq._freq_8[0], 3);	/* set working freq */
+	CS_HIGH;
+
+	CS_LOW;
 	spi_single_write(SX1278_REGISTER_PA_CONFIG, 0x88);	/* set LoRa mode */
+	CS_HIGH;
 
 	//spi_single_write(SX1278_REGISTER_OCP,  0x0B);	/* ocp - default 0x0B*/
+	CS_LOW;
 	spi_single_write(SX1278_REGISTER_LNA, 0x23);	/* lna - enabled, max gain*/
-
+	CS_HIGH;
 
 	if (module->spread_factor == 6)
 	{
