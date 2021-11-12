@@ -47,7 +47,8 @@
 #define CS_HIGH		GPIO_WriteBit(GPIOC, GPIO_Pin_2, 1)
 
 extern void spi_config(void);
-extern void spi_multiple_read(uint8_t* tx_buffer, uint16_t n_byte);
-extern void spi_write(const uint8_t* tx_buffer, uint16_t n_byte);
+extern void spi_read(uint8_t address, uint8_t* rx_buffer, uint16_t n_byte);
+extern void spi_multiple_write(uint8_t address, const uint8_t* tx_buffer, uint16_t n_byte);
+extern void spi_single_write(uint8_t address, uint8_t data);
 
 #endif /* INC_SPI_H_ */

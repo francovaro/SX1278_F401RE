@@ -65,7 +65,7 @@ void spi_config(void)
   SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
   SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;		/* tx and rx */
   SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;							/* 1 byte */
-  SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;							/* cs low */
+  SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;							/* */
   SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;							/* */
   SPI_InitStructure.SPI_NSS = SPI_NSS_Soft 								/*| SPI_NSSInternalSoft_Set*/;
   SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;
@@ -108,11 +108,17 @@ void spi_config(void)
  * @param rx_buffer
  * @param n_byte
  */
-void spi_multiple_read(uint8_t* rx_buffer, uint16_t n_byte)
+void spi_read(uint8_t address, uint8_t* rx_buffer, uint16_t n_byte)
 {
+	uint8_t	i;
 	uint8_t *p_rx_buffer = rx_buffer;
 
-	for (; n_byte > 0; n_byte--)
+	SPIx->DR = address;			/* address */
+	*p_rx_buffer = SPIx->DR;	/* receives first byte */
+	p_rx_buffer++;
+	n_byte--;
+
+	for (i = 0; i < (n_byte); i++)
 	{
 		SPIx->DR = 0xFF;			/* dummy send */
 		*p_rx_buffer = SPIx->DR;	/* receives data */
@@ -125,17 +131,30 @@ void spi_multiple_read(uint8_t* rx_buffer, uint16_t n_byte)
  * @param tx_buffer
  * @param n_byte
  */
-void spi_write(const uint8_t* tx_buffer, uint16_t n_byte)
+void spi_multiple_write(uint8_t address, const uint8_t* tx_buffer, uint16_t n_byte)
 {
+	uint8_t	i;
 	uint8_t dummy_rx;
 	const uint8_t *p_tx_buffer = tx_buffer;
 
 	(void)dummy_rx;	/* no warning */
 
-	for (; n_byte > 0; n_byte--)
+	SPIx->DR = (uint8_t)((1 << 7) | address);	/* W_BIT address */
+	dummy_rx = SPIx->DR;		/* dummy receive */
+
+	for (i = 0; i < n_byte; i++)
 	{
 		SPIx->DR = *p_tx_buffer;	/* send data*/
 		dummy_rx = SPIx->DR;		/* dummy receive */
 		p_tx_buffer++;
 	}
+}
+
+void spi_single_write(uint8_t address, uint8_t data)
+{
+	SPIx->DR = (uint8_t)((1 << 7) | address);	/* W_BIT address */
+	(void)SPIx->DR;		/* dummy receive */
+
+	SPIx->DR = (uint8_t)data;
+	(void)SPIx->DR;		/* dummy receive */
 }

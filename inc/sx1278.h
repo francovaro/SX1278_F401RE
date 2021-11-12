@@ -39,8 +39,17 @@ typedef struct
 	void(*START_SPI)(void);		/* cs lo*/
 	void(*STOP_SPI)(void);		/* cs high */
 
-	uint8_t _freq_carrier;
-	t_state _state;
+	union
+	{
+		uint32_t _freq_32 : 24;
+		uint8_t  _freq_8[2u];
+	}freq;
+
+	uint8_t	power;
+	uint8_t bandwith;
+	uint8_t spread_factor;
+
+	t_mode mode;
 }t_sx1278;
 
 extern void sx1278_init(t_sx1278* module);
