@@ -53,6 +53,7 @@ typedef struct
 }t_sx1278;
 
 extern void sx1278_init(t_sx1278* module);
+extern uint8_t sx1278_get_version(void);
 extern void sx1278_set_mode(t_sx1278* module, t_mode new_mode);
 extern void sx1278_write(t_sx1278* module);
 extern void sx1278_read(t_sx1278* module);

@@ -16,6 +16,8 @@
 #define	OP_MODE_LORA_ON	 ((1 << 7) | (1 << 3))
 #define	OP_MODE_LORA_OFF (1 << 3)
 
+#define SP1278_REG_VERSION	(0x12)
+
 /* freq setting, for now just 434MHz */
 static const uint8_t gfrequency_434[] = {0x6C, 0x80, 0x00}; /* 434MHz */
 

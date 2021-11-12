@@ -25,9 +25,12 @@ static void setup_sx1278(t_sx1278* module);
 int main(void)
 {
 	t_sx1278 module;
+	uint8_t version;
 
 	UART_lib_config(e_UART_2, DISABLE, 0, 0);
 	setup_sx1278(&module);
+
+	version = sx1278_get_version();
 
 	while(1)
 	{

@@ -63,7 +63,7 @@
 #define SX1278_REGISTER_DIO_MAPPING1						0x40
 #define SX1278_REGISTER_DIO_MAPPING2						0x41
 
-#define SX1278_REGISTER_VER									0x41
+#define SX1278_REGISTER_VER									0x42
 
 
 
