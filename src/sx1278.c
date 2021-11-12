@@ -11,6 +11,7 @@
 #include "sx1278_register.h"
 #include "sx1278_parameter_define.h"
 #include "sx1278_pin.h"
+#include "delay.h"
 
 #define CRC_ENABLE	(1u)
 
@@ -22,6 +23,10 @@ void sx1278_init(t_sx1278* module)
 	uint8_t tx_data;
 	spi_config();
 	sx1278_pin_init();
+	delay_init();
+
+	sx1278_set_mode(module, mode_sleep);
+	delay_ms(15u);
 
 	spi_single_write(SX1278_REGISTER_OPMODE, 0x88);	/* set LoRa mode */
 	spi_multiple_write(SX1278_REGISTER_FRF_MSB, &module->freq._freq_8[0], 3);	/* set working freq */
