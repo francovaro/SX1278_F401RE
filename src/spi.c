@@ -112,12 +112,12 @@ void spi_read(uint8_t address, uint8_t* rx_buffer, uint16_t n_byte)
 	uint8_t	i;
 	uint8_t *p_rx_buffer = rx_buffer;
 
+	CS_LOW;
+
 	SPIx->DR = address;			/* address */
 	*p_rx_buffer = SPIx->DR;	/* receives first byte */
 	p_rx_buffer++;
 	n_byte--;
-
-	CS_LOW;
 
 	for (i = 0; i < (n_byte); i++)
 	{

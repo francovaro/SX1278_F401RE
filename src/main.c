@@ -19,7 +19,7 @@
 #include <string.h>
 
 static void setup_sx1278(t_sx1278* module);
-static const char initial_string[] = "sx1278_demo";
+static const char initial_string[] = "sx1278_demo\n";
 
 /**
  *
