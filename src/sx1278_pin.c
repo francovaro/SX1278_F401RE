@@ -12,6 +12,19 @@
 #include "stm32f4xx_tim.h"
 #include "stm32f4xx_exti.h"
 
+#include "delay.h"
+
+#define SX1278_DIO0_PIN			GPIO_Pin_10
+//#define SX1278_DIO1_PIN			GPIO_Pin_11
+
+#define SX1278_DIO0_PIN_SOURCE	EXTI_PinSource10
+//#define SX1278_DIO1_PIN_SOURCE	EXTI_PinSource11
+
+#define SX1278_DIO0_LINE		EXTI_Line10
+//#define SX1278_DIO1_LINE		EXTI_Line11
+
+#define SX1278_RESET_PIN		GPIO_Pin_11
+
 /**
  *
  */
@@ -33,16 +46,22 @@ void sx1278_pin_init(void)
 
 	/* GPIO Init */
 	/* init GPIO as input */
-	GPIO_InitStructure.GPIO_Pin = (SX1278_DIO0_PIN | SX1278_DIO1_PIN);
+	GPIO_InitStructure.GPIO_Pin = (SX1278_DIO0_PIN);
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_Init(GPIOA , &GPIO_InitStructure);
 
+	/* reset pin */
+	GPIO_InitStructure.GPIO_Pin = (SX1278_RESET_PIN);
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_Init(GPIOA , &GPIO_InitStructure);
+
 	/* connect pin to ext */
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, SX1278_DIO0_PIN_SOURCE);
-	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, SX1278_DIO1_PIN_SOURCE);
 
 	/* EXTINT Init */
 	/* set DIO0  10 */
@@ -53,8 +72,8 @@ void sx1278_pin_init(void)
 	EXTI_Init(&EXTI_InitStructure);
 
 	/* set DIO1 */
-	EXTI_InitStructure.EXTI_Line = SX1278_DIO1_LINE;
-	EXTI_Init(&EXTI_InitStructure);
+//	EXTI_InitStructure.EXTI_Line = SX1278_DIO1_LINE;
+//	EXTI_Init(&EXTI_InitStructure);
 
 	/* INTERRUPT Init */
 	/* Enable the USARTx Interrupt */
@@ -66,19 +85,32 @@ void sx1278_pin_init(void)
 }
 
 /**
+ * @brief Manual module reset
+ *
+ * @note datasheet page 117
+ */
+void sx1278_hw_reset(void)
+{
+	GPIO_ResetBits(GPIOA, SX1278_RESET_PIN);
+
+	delay_ms(1u);
+	GPIO_SetBits(GPIOA, SX1278_RESET_PIN);
+
+	delay_ms(5u);
+}
+
+/**
  *
  */
 void EXTI15_10_IRQHandler(void)
 {
-	uint8_t i;
-
 	if (EXTI_GetITStatus(SX1278_DIO0_LINE) == SET)
 	{
 		EXTI_ClearITPendingBit(SX1278_DIO0_LINE);
 	}
 
-	if (EXTI_GetITStatus(SX1278_DIO1_LINE) == SET)
-	{
-		EXTI_ClearITPendingBit(SX1278_DIO1_LINE);
-	}
+//	if (EXTI_GetITStatus(SX1278_DIO1_LINE) == SET)
+//	{
+//		EXTI_ClearITPendingBit(SX1278_DIO1_LINE);
+//	}
 }
