@@ -16,7 +16,10 @@
 #include "sx1278.h"
 #include "sx1278_parameter_define.h"
 
+#include <string.h>
+
 static void setup_sx1278(t_sx1278* module);
+static const char initial_string[] = "sx1278_demo";
 
 /**
  *
@@ -28,6 +31,8 @@ int main(void)
 	uint8_t version;
 
 	UART_lib_config(e_UART_2, DISABLE, 0, 0);
+	UART_lib_sendData(e_UART_2, (char*)initial_string, strlen(initial_string));
+
 	setup_sx1278(&module);
 
 	version = sx1278_get_version();
