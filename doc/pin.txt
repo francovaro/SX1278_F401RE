@@ -1,0 +1,9 @@
+on board:
+1 Vcc	<--> 3.3
+2 GND	<--> GND
+3 MOSI	<--> GPIOC 3
+4 MISO	<--> GPIOC 2
+5 CS	<--> GPIOB 1 
+6 SCK	<--> GPIOB 8
+7 RST	<-->
+8 DIO0	<-->

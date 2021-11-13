@@ -35,6 +35,7 @@ void spi_config(void)
   /* Connect SPI pins to AF5 */
   GPIO_PinAFConfig(SPIx_SCK_GPIO_PORT, SPIx_SCK_SOURCE, SPIx_SCK_AF);
   GPIO_PinAFConfig(SPIx_MOSI_GPIO_PORT, SPIx_MOSI_SOURCE, SPIx_MOSI_AF);
+  GPIO_PinAFConfig(SPIx_MISO_GPIO_PORT, SPIx_MISO_SOURCE, SPIx_MISO_AF);
 
   GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
@@ -46,10 +47,8 @@ void spi_config(void)
   GPIO_Init(SPIx_SCK_GPIO_PORT, &GPIO_InitStructure);
 
   /* SPI  MOSI pin configuration */
-  GPIO_InitStructure.GPIO_Pin =  SPIx_MOSI_PIN;
+  GPIO_InitStructure.GPIO_Pin =  SPIx_MOSI_PIN | SPIx_MISO_PIN;
   GPIO_Init(SPIx_MOSI_GPIO_PORT, &GPIO_InitStructure);
-
-
 
   /* SPI Chip Select pin configuration */
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
@@ -100,7 +99,7 @@ void spi_config(void)
   NVIC_Init(&NVIC_InitStructure);
 #endif
 
-	  CS_H();	/* deselect  */
+  CS_HIGH;	/* deselect  */
 }
 
 /**
@@ -118,12 +117,16 @@ void spi_read(uint8_t address, uint8_t* rx_buffer, uint16_t n_byte)
 	p_rx_buffer++;
 	n_byte--;
 
+	CS_LOW;
+
 	for (i = 0; i < (n_byte); i++)
 	{
 		SPIx->DR = 0xFF;			/* dummy send */
 		*p_rx_buffer = SPIx->DR;	/* receives data */
 		p_rx_buffer++;
 	}
+
+	CS_HIGH;
 }
 
 /**
@@ -139,22 +142,33 @@ void spi_multiple_write(uint8_t address, const uint8_t* tx_buffer, uint16_t n_by
 
 	(void)dummy_rx;	/* no warning */
 
+	CS_LOW;
+
 	SPIx->DR = (uint8_t)((1 << 7) | address);	/* W_BIT address */
 	dummy_rx = SPIx->DR;		/* dummy receive */
 
+
 	for (i = 0; i < n_byte; i++)
 	{
+		while( (SPIx->SR & SPI_I2S_FLAG_TXE) == 0); /* tx not empty */
+		/* whay about SPI_I2S_FLAG_BSY ? */
 		SPIx->DR = *p_tx_buffer;	/* send data*/
 		dummy_rx = SPIx->DR;		/* dummy receive */
 		p_tx_buffer++;
 	}
+
+	CS_HIGH;
 }
 
 void spi_single_write(uint8_t address, uint8_t data)
 {
+	CS_LOW;
+
 	SPIx->DR = (uint8_t)((1 << 7) | address);	/* W_BIT address */
 	(void)SPIx->DR;		/* dummy receive */
 
 	SPIx->DR = (uint8_t)data;
 	(void)SPIx->DR;		/* dummy receive */
+
+	CS_HIGH;
 }

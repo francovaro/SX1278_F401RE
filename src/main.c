@@ -58,6 +58,5 @@ static void setup_sx1278(t_sx1278* module)
 
 	module->spread_factor = ((7u) << 4);		/* */
 
-
 	sx1278_init(module);
 }
