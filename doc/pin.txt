@@ -4,7 +4,7 @@ on board:
 3 MOSI	<--> GPIOC 3
 4 MISO	<--> GPIOC 2
 5 CS	<--> GPIOB 1 
-6 SCK	<--> GPIOB 8
+6 SCK	<--> GPIOB 10
 7 RST	<--> GPIOA 11
 8 DIO0	<--> GPIOA 10
 

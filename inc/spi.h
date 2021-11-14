@@ -41,7 +41,7 @@
 #define SPIx_MISO_SOURCE               GPIO_PinSource2
 #define SPIx_MISO_AF                   GPIO_AF_SPI2
 
-/* CHIP SELECT - GPIOB 08*/
+/* CHIP SELECT - GPIOB 1*/
 #define SPIx_CS_PIN                    GPIO_Pin_1
 #define SPIx_CS_GPIO_PORT              GPIOB
 #define SPIx_CS_GPIO_CLK               RCC_AHB1Periph_GPIOB

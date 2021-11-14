@@ -1,4 +1,4 @@
-/*
+/**
  *  @file  : sx1278_pin.c
  *	
  *  @brief	

@@ -11,6 +11,7 @@
 
 #include "stm32f4xx.h"
 #include "lib_uart.h"
+#include "delay.h"
 
 /* for module */
 #include "sx1278.h"
@@ -29,17 +30,20 @@ int main(void)
 {
 	t_sx1278 module;
 	uint8_t version;
+	RCC_ClocksTypeDef rcc;
+
+	RCC_GetClocksFreq(&rcc);
 
 	UART_lib_config(e_UART_2, DISABLE, 0, 0);
 	UART_lib_sendData(e_UART_2, (char*)initial_string, strlen(initial_string));
 
 	setup_sx1278(&module);
 
-	version = sx1278_get_version();
-
 	while(1)
 	{
-
+		version = sx1278_get_version();
+		__WFE();
+		delay_ms(10);
 	}
 }
 

@@ -18,7 +18,7 @@ void delay_init(void)
 {
 	_delay_ms = 0;
 	SystemCoreClockUpdate();
-	SysTick_Config(SystemCoreClock / 1000);
+	SysTick_Config(SystemCoreClock / 100);
 }
 
 /**

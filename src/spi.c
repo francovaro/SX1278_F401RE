@@ -40,7 +40,7 @@ void spi_config(void)
   GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;
+  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
 
   /* SPI SCK pin configuration */
   GPIO_InitStructure.GPIO_Pin = SPIx_SCK_PIN;
@@ -67,9 +67,9 @@ void spi_config(void)
   SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;							/* */
   SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;							/* */
   SPI_InitStructure.SPI_NSS = SPI_NSS_Soft 								/*| SPI_NSSInternalSoft_Set*/;
-  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;
+  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8;
   SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
-  //SPI_InitStructure.SPI_CRCPolynomial = 10;
+  SPI_InitStructure.SPI_CRCPolynomial = 7;
 
   //SPI_NSSInternalSoftwareConfig(SPIx, SPI_NSSInternalSoft_Set);
   SPI_Init(SPIx, &SPI_InitStructure);
@@ -117,13 +117,12 @@ void spi_read(uint8_t address, uint8_t* rx_buffer, uint16_t n_byte)
 
 	SPIx->DR = address;			/* address */
 	dummy_read = SPIx->DR;	/* receives first byte */
-	(void)dummy_read;
-//	p_rx_buffer++;
-//	n_byte--;
+	//(void)dummy_read;
 
 	for (i = 0; i < (n_byte); i++)
 	{
-		SPIx->DR = 0xFF;			/* dummy send */
+		while( (SPIx->SR & SPI_I2S_FLAG_TXE) == 0); /* tx not empty */
+		//SPIx->DR = 0xFF;			/* dummy send */
 		*p_rx_buffer = SPIx->DR;	/* receives data */
 		p_rx_buffer++;
 	}
@@ -147,7 +146,7 @@ void spi_multiple_write(uint8_t address, const uint8_t* tx_buffer, uint16_t n_by
 	CS_LOW;
 
 	SPIx->DR = (uint8_t)((1 << 7) | address);	/* W_BIT address */
-	dummy_rx = SPIx->DR;		/* dummy receive */
+	//dummy_rx = SPIx->DR;		/* dummy receive */
 
 
 	for (i = 0; i < n_byte; i++)
@@ -155,7 +154,7 @@ void spi_multiple_write(uint8_t address, const uint8_t* tx_buffer, uint16_t n_by
 		while( (SPIx->SR & SPI_I2S_FLAG_TXE) == 0); /* tx not empty */
 		/* whay about SPI_I2S_FLAG_BSY ? */
 		SPIx->DR = *p_tx_buffer;	/* send data*/
-		dummy_rx = SPIx->DR;		/* dummy receive */
+		//dummy_rx = SPIx->DR;		/* dummy receive */
 		p_tx_buffer++;
 	}
 
@@ -167,10 +166,11 @@ void spi_single_write(uint8_t address, uint8_t data)
 	CS_LOW;
 
 	SPIx->DR = (uint8_t)((1 << 7) | address);	/* W_BIT address */
-	(void)SPIx->DR;		/* dummy receive */
+	//(void)SPIx->DR;		/* dummy receive */
 
+	while( (SPIx->SR & SPI_I2S_FLAG_TXE) == 0); /* tx not empty */
 	SPIx->DR = (uint8_t)data;
-	(void)SPIx->DR;		/* dummy receive */
+	//(void)SPIx->DR;		/* dummy receive */
 
 	CS_HIGH;
 }
