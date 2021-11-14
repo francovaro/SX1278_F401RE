@@ -67,7 +67,7 @@ void spi_config(void)
   SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;							/* */
   SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;							/* */
   SPI_InitStructure.SPI_NSS = SPI_NSS_Soft 								/*| SPI_NSSInternalSoft_Set*/;
-  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;
+  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;
   SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
   //SPI_InitStructure.SPI_CRCPolynomial = 10;
 
@@ -111,13 +111,15 @@ void spi_read(uint8_t address, uint8_t* rx_buffer, uint16_t n_byte)
 {
 	uint8_t	i;
 	uint8_t *p_rx_buffer = rx_buffer;
+	uint8_t dummy_read;
 
 	CS_LOW;
 
 	SPIx->DR = address;			/* address */
-	*p_rx_buffer = SPIx->DR;	/* receives first byte */
-	p_rx_buffer++;
-	n_byte--;
+	dummy_read = SPIx->DR;	/* receives first byte */
+	(void)dummy_read;
+//	p_rx_buffer++;
+//	n_byte--;
 
 	for (i = 0; i < (n_byte); i++)
 	{
