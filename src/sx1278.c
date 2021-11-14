@@ -38,9 +38,9 @@ void sx1278_init(t_sx1278* module)
 	spi_read(SX1278_REGISTER_FRF_MSB, &rx_buffer[0], 3u);
 	(void)rx_buffer;
 
-	spi_single_write(SX1278_REGISTER_PA_CONFIG, 0x88);	/* set LoRa mode */
+	spi_single_write(SX1278_REGISTER_PA_CONFIG, 0xF9);	/* set LoRa mode */
 
-	//spi_single_write(SX1278_REGISTER_OCP,  0x0B);	/* ocp - default 0x0B*/
+	spi_single_write(SX1278_REGISTER_OCP,  module->power);	/* ocp - default 0x0B*/
 	spi_single_write(SX1278_REGISTER_LNA, 0x23);	/* lna - enabled, max gain*/
 
 	if (module->spread_factor == 6)
