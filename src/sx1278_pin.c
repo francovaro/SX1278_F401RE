@@ -82,6 +82,8 @@ void sx1278_pin_init(void)
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;			/* to check ! */
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
+
+	GPIO_SetBits(GPIOA, SX1278_RESET_PIN);
 }
 
 /**

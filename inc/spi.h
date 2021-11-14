@@ -42,16 +42,13 @@
 #define SPIx_MISO_AF                   GPIO_AF_SPI2
 
 /* CHIP SELECT - GPIOB 08*/
-#define SPIx_CS_PIN                    GPIO_Pin_9
+#define SPIx_CS_PIN                    GPIO_Pin_1
 #define SPIx_CS_GPIO_PORT              GPIOB
 #define SPIx_CS_GPIO_CLK               RCC_AHB1Periph_GPIOB
 
 // CS pin macros
-#define CS_L() GPIO_ResetBits(SPIx_CS_GPIO_PORT, SPIx_CS_PIN)
-#define CS_H() GPIO_SetBits(SPIx_CS_GPIO_PORT, SPIx_CS_PIN)
-
-#define CS_LOW		GPIO_WriteBit(GPIOC, GPIO_Pin_2, 0)
-#define CS_HIGH		GPIO_WriteBit(GPIOC, GPIO_Pin_2, 1)
+#define CS_LOW		GPIO_ResetBits(SPIx_CS_GPIO_PORT, SPIx_CS_PIN)
+#define CS_HIGH		GPIO_SetBits(SPIx_CS_GPIO_PORT, SPIx_CS_PIN)
 
 extern void spi_config(void);
 extern void spi_read(uint8_t address, uint8_t* rx_buffer, uint16_t n_byte);

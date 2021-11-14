@@ -7,3 +7,7 @@ on board:
 6 SCK	<--> GPIOB 8
 7 RST	<--> GPIOA 11
 8 DIO0	<--> GPIOA 10
+
+USART:
+tx GPIOA 2
+rx GPIOA 3
