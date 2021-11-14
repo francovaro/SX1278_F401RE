@@ -19,8 +19,13 @@
 
 #include <string.h>
 
+#define SX1278_VERSION		0x12
+
 static void setup_sx1278(t_sx1278* module);
 static const char initial_string[] = "sx1278_demo\n";
+
+static const char found_sx1278[] = 		"sx1278 with version 0x12 found\n";
+static const char notfound_sx1278[] = 	"sx1278 not found :( \n";
 
 /**
  *
@@ -29,7 +34,6 @@ static const char initial_string[] = "sx1278_demo\n";
 int main(void)
 {
 	t_sx1278 module;
-	uint8_t version;
 	RCC_ClocksTypeDef rcc;
 
 	RCC_GetClocksFreq(&rcc);
@@ -39,9 +43,11 @@ int main(void)
 
 	setup_sx1278(&module);
 
+
+
 	while(1)
 	{
-		version = sx1278_get_version();
+
 		__WFE();
 		delay_ms(10);
 	}
@@ -52,6 +58,7 @@ int main(void)
  */
 static void setup_sx1278(t_sx1278* module)
 {
+	uint8_t version = 0;
 
 	module->freq._freq_8[0] = gfrequency_434[0];
 	module->freq._freq_8[1] = gfrequency_434[1];
@@ -63,4 +70,14 @@ static void setup_sx1278(t_sx1278* module)
 	module->spread_factor = ((7u) << 4);		/* */
 
 	sx1278_init(module);
+
+	version = sx1278_get_version();
+	if (version == SX1278_VERSION)
+	{
+		UART_lib_sendData(e_UART_2, (char*)found_sx1278, strlen(found_sx1278));
+	}
+	else
+	{
+		UART_lib_sendData(e_UART_2, (char*)notfound_sx1278, strlen(notfound_sx1278));
+	}
 }
