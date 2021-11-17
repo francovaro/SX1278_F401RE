@@ -22,6 +22,9 @@
 #define SX1278_VERSION		0x12
 
 static void setup_sx1278(t_sx1278* module);
+static void app_rx(t_sx1278* module);
+static void app_tx(t_sx1278* module);
+
 static const char initial_string[] = "sx1278_demo\n";
 
 static const char found_sx1278[] = 		"sx1278 with version 0x12 found\n";
@@ -33,6 +36,7 @@ static const char notfound_sx1278[] = 	"sx1278 not found :( \n";
  */
 int main(void)
 {
+	uint8_t type = 0;
 	t_sx1278 module;
 	RCC_ClocksTypeDef rcc;
 
@@ -44,6 +48,14 @@ int main(void)
 	setup_sx1278(&module);
 
 
+	if (type == 0)
+	{
+		app_rx(&module);
+	}
+	else
+	{
+		app_tx(&module);
+	}
 
 	while(1)
 	{
@@ -79,5 +91,37 @@ static void setup_sx1278(t_sx1278* module)
 	else
 	{
 		UART_lib_sendData(e_UART_2, (char*)notfound_sx1278, strlen(notfound_sx1278));
+	}
+}
+
+/**
+ *
+ * @param module
+ */
+static void app_rx(t_sx1278* module)
+{
+	sx1278_start_rx_mode(module);
+
+	while(1)
+	{
+
+		sx1278_send_packet(module);
+		delay_ms(1000u);
+	}
+}
+
+/**
+ *
+ * @param module
+ */
+static void app_tx(t_sx1278* module)
+{
+	sx1278_start_tx_mode(module);
+
+	while(1)
+	{
+
+		sx1278_receive_packet(module);
+		delay_ms(1000u);
 	}
 }

@@ -26,8 +26,8 @@ void sx1278_init(t_sx1278* module)
 	spi_config();
 	sx1278_pin_init();
 
-	module->cs_pin = GPIO_Pin_1;
-	module->cs_port = GPIOB;
+	module->cs_pin = GPIO_Pin_1;	/* should be a parameter */
+	module->cs_port = GPIOB;		/* should be a parameter */
 
 
 	delay_init();
@@ -128,12 +128,34 @@ void sx1278_clears_irq(t_sx1278* module)
  *
  * @param module
  */
-void sx1278_write(t_sx1278* module)
+void sx1278_start_rx_mode(t_sx1278* module)
 {
 
 }
 
-void sx1278_read(t_sx1278* module)
+/**
+ *
+ * @param module
+ */
+void sx1278_start_tx_mode(t_sx1278* module)
+{
+
+}
+
+/**
+ *
+ * @param module
+ */
+void sx1278_send_packet(t_sx1278* module)
+{
+
+}
+
+/**
+ *
+ * @param module
+ */
+void sx1278_receive_packet(t_sx1278* module)
 {
 
 }
