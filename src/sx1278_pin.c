@@ -7,12 +7,13 @@
  *  @date  : 12 nov 2021
  */
 #include "sx1278_pin.h"
-#include <stdint.h>
 #include "stm32f4xx_rcc.h"
 #include "stm32f4xx_tim.h"
 #include "stm32f4xx_exti.h"
 
 #include "delay.h"
+
+volatile uint8_t dio0_status;
 
 #define SX1278_DIO0_PIN			GPIO_Pin_10
 //#define SX1278_DIO1_PIN			GPIO_Pin_11
@@ -67,7 +68,7 @@ void sx1278_pin_init(void)
 	/* set DIO0  10 */
 	EXTI_InitStructure.EXTI_Line = SX1278_DIO0_LINE;
 	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;		/* yeah rising or falling ? */
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;		/* yeah rising or falling ? */
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	EXTI_Init(&EXTI_InitStructure);
 
@@ -83,6 +84,7 @@ void sx1278_pin_init(void)
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 
+	dio0_status = 0;
 	GPIO_SetBits(GPIOA, SX1278_RESET_PIN);
 }
 
@@ -108,6 +110,7 @@ void EXTI15_10_IRQHandler(void)
 {
 	if (EXTI_GetITStatus(SX1278_DIO0_LINE) == SET)
 	{
+		dio0_status = 1;
 		EXTI_ClearITPendingBit(SX1278_DIO0_LINE);
 	}
 

@@ -12,6 +12,8 @@
 
 #include <stdint.h>
 
+#define SX1278_MAX_RX_BUFFER_SIZE	(255u)
+
 typedef enum
 {
 	state_sleep,
@@ -36,9 +38,11 @@ typedef enum
 
 typedef struct
 {
+	/* pin config */
 	uint16_t 		cs_pin;
 	GPIO_TypeDef* 	cs_port;
 
+	/* parameter */
 	union
 	{
 		uint32_t _freq_32 : 24;
@@ -48,6 +52,14 @@ typedef struct
 	uint8_t	power;
 	uint8_t bandwith;
 	uint8_t spread_factor;
+
+	FunctionalState freq_hop;
+
+	uint32_t packet_timeout;
+
+	/* status */
+	uint8_t	rx_buffer[SX1278_MAX_RX_BUFFER_SIZE];	/* rx buffer */
+	uint32_t total_rx;								/* total rx count */
 
 	t_mode mode;
 }t_sx1278;
@@ -59,10 +71,10 @@ extern void sx1278_set_mode(t_sx1278* module, t_mode new_mode);
 extern void sx1278_set_irq_mask(t_sx1278* module, uint8_t mask);
 extern void sx1278_clears_irq(t_sx1278* module);
 
-extern void sx1278_start_tx_mode(t_sx1278* module);
+extern void sx1278_start_tx_mode(t_sx1278* module, uint8_t payload);
 extern void sx1278_send_packet(t_sx1278* module);
 
-extern void sx1278_start_rx_mode(t_sx1278* module);
+extern void sx1278_start_rx_mode(t_sx1278* module, uint8_t payload, uint32_t rx_timeout);
 extern void sx1278_receive_packet(t_sx1278* module);
 
 #endif /* INC_SX1278_H_ */

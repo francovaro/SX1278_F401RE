@@ -13,6 +13,8 @@
 #include "sx1278_pin.h"
 #include "delay.h"
 
+#include <string.h>
+
 #define CRC_ENABLE	(1u)
 
 /**
@@ -128,26 +130,41 @@ void sx1278_clears_irq(t_sx1278* module)
  *
  * @param module
  */
-void sx1278_start_rx_mode(t_sx1278* module)
+void sx1278_start_rx_mode(t_sx1278* module, uint8_t payload, uint32_t rx_timeout)
 {
+	/*
+	 * set stdby
+	 * set irq, if needed
+	 * set hop period
+	 * diox mapping
+	 * set mode
+	 * - if continuous, set addr ptr read from rx fifo address
+	 */
+	uint8_t address;
 
-}
+	if (module->mode != mode_stdby)
+	{
+		sx1278_set_mode(module, mode_stdby);	/* set standby before doing stuff  */
+	}
 
-/**
- *
- * @param module
- */
-void sx1278_start_tx_mode(t_sx1278* module)
-{
+	//spi_single_write(SX1278_REGISTER_IRQFLAGS, 0x84);
+	module->freq_hop = DISABLE;
+	spi_single_write(SX1278_REGISTER_HOPPERIOD, 0xFF);	/* no freq hop ! const for now... */
+	sx1278_set_irq_mask(module, 0x3F);
+	sx1278_clears_irq(module);
 
-}
+	spi_single_write(SX1278_REGISTER_PAYLOADLENGTH, 0xFF);
+	spi_single_write(SX1278_REGISTER_PAYLOADMAXLENGTH, payload);	/* equal  ?*/
 
-/**
- *
- * @param module
- */
-void sx1278_send_packet(t_sx1278* module)
-{
+	spi_read(SX1278_REGISTER_FIFORXBASEADDR, &address, 1);		/* get rx fifo address */
+	spi_single_write(SX1278_REGISTER_FIFOADDRPTR, address);		/* and set to fifo add */
+
+	sx1278_set_mode(module, mode_receive_continuous);	/* rx cont mode ! */
+	module->total_rx = 0;
+
+	memset(module->rx_buffer, 0, sizeof(module->rx_buffer));
+
+	module->packet_timeout = rx_timeout;
 
 }
 
@@ -156,6 +173,52 @@ void sx1278_send_packet(t_sx1278* module)
  * @param module
  */
 void sx1278_receive_packet(t_sx1278* module)
+{
+	uint8_t		cur_addr;
+	uint8_t		byte_rec;
+
+	if (dio0_status == 1)
+	{
+
+		spi_read(SX1278_REGISTER_FIFORXCURRENTADDR, &cur_addr, 1);		/* get curr addr */
+		spi_single_write(SX1278_REGISTER_FIFOADDRPTR, cur_addr);		/* and set to fifo add */
+
+		spi_read(SX1278_REGISTER_RXNBBYTES, &byte_rec, 1); 				/* get rx size - Number of payload bytes of latest packet received*/
+
+		module->total_rx += byte_rec;
+		spi_read(SX1278_REGISTER_FIFO, &module->rx_buffer[0], byte_rec);	/* get RX fifo */
+
+		if (module->freq_hop == ENABLE)
+		{
+			/*
+			 * todo
+			 */
+		}
+
+		dio0_status = 0;
+		sx1278_clears_irq(module);
+	}
+}
+
+/**
+ *
+ * @param module
+ */
+void sx1278_start_tx_mode(t_sx1278* module, uint8_t payload)
+{
+	/* we hope module has already been configured... ? */
+	if (module->mode != mode_stdby)
+	{
+		sx1278_set_mode(module, mode_stdby);	/* set standby before doing stuff  */
+	}
+
+
+}
+/**
+ *
+ * @param module
+ */
+void sx1278_send_packet(t_sx1278* module)
 {
 
 }

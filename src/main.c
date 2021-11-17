@@ -21,13 +21,14 @@
 
 #define SX1278_VERSION		0x12
 
+#define RX_TIMEOUT			100000
+#define	PAYLOAD				10
+
+
 static void setup_sx1278(t_sx1278* module);
 static void app_rx(t_sx1278* module);
 static void app_tx(t_sx1278* module);
 
-static const char initial_string[] = "sx1278_demo\n";
-
-static const char found_sx1278[] = 		"sx1278 with version 0x12 found\n";
 static const char notfound_sx1278[] = 	"sx1278 not found :( \n";
 
 /**
@@ -43,7 +44,7 @@ int main(void)
 	RCC_GetClocksFreq(&rcc);
 
 	UART_lib_config(e_UART_2, DISABLE, 0, 0);
-	UART_lib_sendData(e_UART_2, (char*)initial_string, strlen(initial_string));
+	UART_lib_free_send(e_UART_2, "sx1278_demo\n");
 
 	setup_sx1278(&module);
 
@@ -86,7 +87,7 @@ static void setup_sx1278(t_sx1278* module)
 	version = sx1278_get_version(module);
 	if (version == SX1278_VERSION)
 	{
-		UART_lib_sendData(e_UART_2, (char*)found_sx1278, strlen(found_sx1278));
+		UART_lib_free_send(e_UART_2, "sx1278 with version 0x12 found\n");
 	}
 	else
 	{
@@ -100,7 +101,8 @@ static void setup_sx1278(t_sx1278* module)
  */
 static void app_rx(t_sx1278* module)
 {
-	sx1278_start_rx_mode(module);
+	UART_lib_free_send(e_UART_2, "sx1278 rx\n");
+	sx1278_start_rx_mode(module, PAYLOAD, RX_TIMEOUT);
 
 	while(1)
 	{
@@ -116,7 +118,8 @@ static void app_rx(t_sx1278* module)
  */
 static void app_tx(t_sx1278* module)
 {
-	sx1278_start_tx_mode(module);
+	UART_lib_free_send(e_UART_2, "sx1278 tx\n");
+	sx1278_start_tx_mode(module, PAYLOAD);
 
 	while(1)
 	{
