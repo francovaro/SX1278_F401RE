@@ -25,6 +25,11 @@ void sx1278_init(t_sx1278* module)
 
 	spi_config();
 	sx1278_pin_init();
+
+	module->cs_pin = GPIO_Pin_1;
+	module->cs_port = GPIOB;
+
+
 	delay_init();
 
 	sx1278_hw_reset();	/* reset */
@@ -90,7 +95,7 @@ void sx1278_set_mode(t_sx1278* module, t_mode new_mode)
  *
  * @return The version (should be 0x12)
  */
-uint8_t sx1278_get_version(void)
+uint8_t sx1278_get_version(t_sx1278* module)
 {
 	uint8_t ver;
 
@@ -99,6 +104,30 @@ uint8_t sx1278_get_version(void)
 	return ver;
 }
 
+/**
+ *
+ * @param mask
+ */
+void sx1278_set_irq_mask(t_sx1278* module, uint8_t mask)
+{
+	spi_single_write(SX1278_REGISTER_IRQFLAGSMASK, mask);
+}
+
+/**
+ *
+ */
+void sx1278_clears_irq(t_sx1278* module)
+{
+	/*
+	 * irq are cleared by writing a 1
+	 */
+	spi_single_write(SX1278_REGISTER_IRQFLAGS, 0xFF);
+}
+
+/**
+ *
+ * @param module
+ */
 void sx1278_write(t_sx1278* module)
 {
 

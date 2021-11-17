@@ -180,6 +180,11 @@ void spi_multiple_write(uint8_t address, const uint8_t* tx_buffer, uint16_t n_by
 	CS_HIGH;
 }
 
+/**
+ *
+ * @param address
+ * @param data
+ */
 void spi_single_write(uint8_t address, uint8_t data)
 {
 	uint8_t dummy_rx;

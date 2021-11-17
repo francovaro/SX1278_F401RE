@@ -36,8 +36,8 @@ typedef enum
 
 typedef struct
 {
-//	void(*START_SPI)(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, BitAction BitVal);		/* cs lo*/
-//	void(*STOP_SPI)(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, BitAction BitVal);		/* cs high */
+	uint16_t 		cs_pin;
+	GPIO_TypeDef* 	cs_port;
 
 	union
 	{
@@ -53,9 +53,13 @@ typedef struct
 }t_sx1278;
 
 extern void sx1278_init(t_sx1278* module);
-extern uint8_t sx1278_get_version(void);
+extern uint8_t sx1278_get_version(t_sx1278* module);
 extern void sx1278_set_mode(t_sx1278* module, t_mode new_mode);
-extern void sx1278_write(t_sx1278* module);
-extern void sx1278_read(t_sx1278* module);
+
+extern void sx1278_set_irq_mask(t_sx1278* module, uint8_t mask);
+extern void sx1278_clears_irq(t_sx1278* module);
+
+extern void sx1278_send_packet(t_sx1278* module);
+extern void sx1278_receive_packet(t_sx1278* module);
 
 #endif /* INC_SX1278_H_ */

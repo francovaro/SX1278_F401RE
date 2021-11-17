@@ -71,7 +71,7 @@ static void setup_sx1278(t_sx1278* module)
 
 	sx1278_init(module);
 
-	version = sx1278_get_version();
+	version = sx1278_get_version(module);
 	if (version == SX1278_VERSION)
 	{
 		UART_lib_sendData(e_UART_2, (char*)found_sx1278, strlen(found_sx1278));
