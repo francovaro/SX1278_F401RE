@@ -101,13 +101,15 @@ static void setup_sx1278(t_sx1278* module)
  */
 static void app_rx(t_sx1278* module)
 {
+	char hello_str[] = { "hello from stm"};
+	uint32_t	delay_ms = 5000;
+
 	UART_lib_free_send(e_UART_2, "sx1278 rx\n");
 	sx1278_start_rx_mode(module, PAYLOAD, RX_TIMEOUT);
 
 	while(1)
 	{
-
-		sx1278_send_packet(module);
+		sx1278_send_packet(module, hello_str, strlen(hello_str), delay_ms);
 		delay_ms(1000u);
 	}
 }

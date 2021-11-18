@@ -72,7 +72,6 @@ void sx1278_init(t_sx1278* module)
 	spi_single_write(SX1278_REGISTER_PREAMBLELSB, 12); 			//RegPreambleLsb 8+4=12byte Preamble
 
 	sx1278_set_mode(module, mode_stdby);
-	spi_single_write(SX1278_REGISTER_DIO_MAPPING1, 0x01); //* DIO0 TxDone DI1 RxDone*/
 }
 
 /**
@@ -127,7 +126,7 @@ void sx1278_clears_irq(t_sx1278* module)
 }
 
 /**
- *
+ * @brief prepare the module to go into rx mode
  * @param module
  */
 void sx1278_start_rx_mode(t_sx1278* module, uint8_t payload, uint32_t rx_timeout)
@@ -150,14 +149,17 @@ void sx1278_start_rx_mode(t_sx1278* module, uint8_t payload, uint32_t rx_timeout
 	//spi_single_write(SX1278_REGISTER_IRQFLAGS, 0x84);
 	module->freq_hop = DISABLE;
 	spi_single_write(SX1278_REGISTER_HOPPERIOD, 0xFF);	/* no freq hop ! const for now... */
-	sx1278_set_irq_mask(module, 0x3F);
+
+	sx1278_set_irq_mask(module, 0xFF);
 	sx1278_clears_irq(module);
 
-	spi_single_write(SX1278_REGISTER_PAYLOADLENGTH, 0xFF);
-	spi_single_write(SX1278_REGISTER_PAYLOADMAXLENGTH, payload);	/* equal  ?*/
+	spi_single_write(SX1278_REGISTER_PAYLOADLENGTH, payload);
+	//spi_single_write(SX1278_REGISTER_PAYLOADMAXLENGTH, payload);	/* equal  ?*/
 
 	spi_read(SX1278_REGISTER_FIFORXBASEADDR, &address, 1);		/* get rx fifo address */
 	spi_single_write(SX1278_REGISTER_FIFOADDRPTR, address);		/* and set to fifo add */
+
+	spi_single_write(SX1278_REGISTER_DIO_MAPPING1, 0x00); /* RxDone */
 
 	sx1278_set_mode(module, mode_receive_continuous);	/* rx cont mode ! */
 	module->total_rx = 0;
@@ -169,7 +171,7 @@ void sx1278_start_rx_mode(t_sx1278* module, uint8_t payload, uint32_t rx_timeout
 }
 
 /**
- *
+ * @brief Put the module in continuos RX mode
  * @param module
  */
 void sx1278_receive_packet(t_sx1278* module)
@@ -206,19 +208,55 @@ void sx1278_receive_packet(t_sx1278* module)
  */
 void sx1278_start_tx_mode(t_sx1278* module, uint8_t payload)
 {
+	uint8_t	address;
+
 	/* we hope module has already been configured... ? */
 	if (module->mode != mode_stdby)
 	{
 		sx1278_set_mode(module, mode_stdby);	/* set standby before doing stuff  */
 	}
 
+	module->freq_hop = DISABLE;
+	spi_single_write(SX1278_REGISTER_HOPPERIOD, 0x00);	/* no freq hop ! const for now... */
 
+	sx1278_set_irq_mask(module, 0x3F);
+	sx1278_clears_irq(module);
+
+	spi_single_write(SX1278_REGISTER_PAYLOADLENGTH, payload);
+	spi_read(SX1278_REGISTER_FIFOTXBASEADDR, &address, 1);		/* get rx fifo address */
+	spi_single_write(SX1278_REGISTER_FIFOADDRPTR, address);		/* and set to fifo add */
+
+	spi_single_write(SX1278_REGISTER_DIO_MAPPING1, 0x01); /* TxDone */
 }
 /**
  *
  * @param module
  */
-void sx1278_send_packet(t_sx1278* module)
+void sx1278_send_packet(t_sx1278* module, uint8_t* tx_buffer, uint32_t byte_to_send, uint32_t timeout_ms)
 {
+	bool end_loop = false;
 
+	sx1278_set_mode(module, mode_tx);	/* set standby before doing stuff  */
+	spi_multiple_write(SX1278_REGISTER_FIFO, tx_buffer, byte_to_send);
+
+	delay_load_ms(timeout_ms);
+
+	do
+	{
+		if (dio0_status == 1)
+		{
+			dio0_status = 0;
+			end_loop = true;
+			sx1278_clears_irq(module);
+		}
+
+
+		if (delay_has_expired())
+		{
+			end_loop = true;
+			/*
+			 * signal an error ?
+			 */
+		}
+	}while(end_loop == false);
 }

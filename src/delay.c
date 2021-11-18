@@ -25,7 +25,7 @@ void delay_init(void)
  * @brief
  * @param delay
  */
-void delay_ms(uint16_t new_delay)
+void delay_ms(uint32_t new_delay)
 {
 	_delay_ms = new_delay;
 	do
@@ -38,7 +38,7 @@ void delay_ms(uint16_t new_delay)
  *
  * @param new_delay
  */
-void delay_load_ms(uint16_t new_delay)
+void delay_load_ms(uint32_t new_delay)
 {
 	_delay_ms = new_delay;
 }

@@ -14,8 +14,8 @@
 #include <stdbool.h>
 
 extern void delay_init(void);
-extern void delay_ms(uint16_t delay);
-extern void delay_load_ms(uint16_t delay);
+extern void delay_ms(uint32_t delay);
+extern void delay_load_ms(uint32_t delay);
 extern bool delay_has_expired(void);
 
 
